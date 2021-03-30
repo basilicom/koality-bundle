@@ -1,0 +1,5 @@
+koality:
+    resource: "@KoalityBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
