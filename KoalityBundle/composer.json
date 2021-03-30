@@ -1,0 +1,32 @@
+{
+  "name": "basilicom/koality-bundle",
+  "description": "description",
+  "type": "pimcore-bundle",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Basilicom\\KoalityBundle\\": "./src"
+    }
+  },
+  "homepage": "https://basilicom.de",
+  "authors": [
+    {
+      "name": "Hendrik Hofmann",
+      "email": "hendrik.hofmann@basilicom.de",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "ext-json": "*",
+    "leankoala/healthfoundation": "*"
+  },
+  "extra": {
+    "pimcore": {
+      "bundles": [
+        "Basilicom\\KoalityBundle\\KoalityBundle"
+      ]
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
