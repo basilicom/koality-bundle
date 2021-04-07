@@ -2,52 +2,75 @@
 
 namespace Basilicom\KoalityBundle\Controller;
 
-use Leankoala\HealthFoundation\Result\Format\Ietf\IetfFormat as IetfFormat;
+use Basilicom\KoalityBundle\Checks\OrdersPerHourCheck;
+use Leankoala\HealthFoundation\Result\Format\Koality\KoalityFormat as KoalityFormat;
 use Pimcore\Controller\FrontendController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Leankoala\HealthFoundation\HealthFoundation as HealthFoundation;
 use Leankoala\HealthFoundation\Check\Device\SpaceUsedCheck;
 use Leankoala\HealthFoundation\Check\Docker\Container\ContainerIsRunningCheck;
 
-
 class DefaultController extends FrontendController
 {
     private HealthFoundation $healthFoundation;
+    private KoalityFormat  $koalityFormatter;
+
     private SpaceUsedCheck $spaceUsedCheck;
     private ContainerIsRunningCheck $containerIsRunningCheck;
-    private IetfFormat $formatter;
-    private array $checks;
+
+    private OrdersPerHourCheck $ordersPerHourCheck;
 
 
     /**
      * @Route("/koality-status")
      */
-    public function indexAction(Request $request )
+    public function indexAction()
     {
         $this->init();
-        $this->runChecks();
 
-        return new Response('hallo welt');
+        //$this->getNewestOrders();exit;
+
+        $response = new Response();
+        $response->setContent($this->runChecks());
+        $response->headers->set('Content-Type', 'application/health+json');
+        $response->send();
+
+
+
+        return $response;
     }
 
-    /*
-     * Einfach alle Checks mit registerCheck registrieren und dann runHealthCheck ausführen
-     * So kann ich auch eigene Checks hinzufügen....muss mich aber an die Struktur vom Formater etc halten.
+    private function init(){
+        $this->healthFoundation = new HealthFoundation();
+        $this->koalityFormatter = new KoalityFormat();
+
+        $this->spaceUsedCheck = new SpaceUsedCheck();
+        $this->containerIsRunningCheck = new ContainerIsRunningCheck();
+
+        $this->ordersPerHourCheck = new OrdersPerHourCheck();
+    }
+
+    /**
      *
-     * */
+     */
     public function runChecks() {
 
         $this->runSpaceUsedCheck();
         $this->runContainerIsRunningCheck();
+        $this->runOrdersPerHourCheck();
 
 
 
         $runResult = $this->healthFoundation->runHealthCheck();
 
+        /**Necessary, because the handle function is only echoing the JSON Response*/
+        ob_start();
+        $this->koalityFormatter->handle($runResult);
+        $ietfJson = ob_get_contents();
+        ob_clean();
 
-        //$this->formatter->handle($runResult);
+        return $ietfJson;
     }
 
     private function runSpaceUsedCheck() {
@@ -58,9 +81,6 @@ class DefaultController extends FrontendController
             'space_used_check',
             'Space used on storage server'
         );
-
-
-
     }
 
     private function runContainerIsRunningCheck() {
@@ -73,11 +93,12 @@ class DefaultController extends FrontendController
         );
     }
 
+    private function runOrdersPerHourCheck() {
 
-    private function init(){
-        $this->formatter = new IetfFormat();
-        $this->spaceUsedCheck = new SpaceUsedCheck();
-        $this->healthFoundation = new HealthFoundation();
-        $this->containerIsRunningCheck = new ContainerIsRunningCheck();
+        $this->healthFoundation->registerCheck(
+            $this->ordersPerHourCheck,
+            'orders_per_hour_check',
+            'Shows count of orders during the last hour'
+        );
     }
 }
