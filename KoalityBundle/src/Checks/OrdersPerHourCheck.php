@@ -6,7 +6,6 @@ use Leankoala\HealthFoundation\Check\Check;
 use Leankoala\HealthFoundation\Check\Result;
 use Leankoala\HealthFoundation\Check\MetricAwareResult;
 use Pimcore\Bundle\EcommerceFrameworkBundle\Factory;
-use \Pimcore\Bundle\EcommerceFrameworkBundle\OrderManager\Order\Listing\Filter\OrderDateTime;
 
 class OrdersPerHourCheck implements Check
 {
@@ -36,8 +35,6 @@ class OrdersPerHourCheck implements Check
 
         return count($orderList);
     }
-
-
 
     public function getIdentifier()
     {

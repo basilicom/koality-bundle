@@ -21,7 +21,6 @@ class DefaultController extends FrontendController
 
     private OrdersPerHourCheck $ordersPerHourCheck;
 
-
     /**
      * @Route("/koality-status")
      */
@@ -29,48 +28,23 @@ class DefaultController extends FrontendController
     {
         $this->init();
 
-        //$this->getNewestOrders();exit;
-
         $response = new Response();
         $response->setContent($this->runChecks());
         $response->headers->set('Content-Type', 'application/health+json');
         $response->send();
 
-
-
         return $response;
     }
 
-    private function init(){
-        $this->healthFoundation = new HealthFoundation();
-        $this->koalityFormatter = new KoalityFormat();
-
-        $this->spaceUsedCheck = new SpaceUsedCheck();
-        $this->containerIsRunningCheck = new ContainerIsRunningCheck();
-
-        $this->ordersPerHourCheck = new OrdersPerHourCheck();
-    }
-
-    /**
-     *
-     */
     public function runChecks() {
 
         $this->runSpaceUsedCheck();
         $this->runContainerIsRunningCheck();
         $this->runOrdersPerHourCheck();
 
-
-
         $runResult = $this->healthFoundation->runHealthCheck();
 
-        /**Necessary, because the handle function is only echoing the JSON Response*/
-        ob_start();
-        $this->koalityFormatter->handle($runResult);
-        $ietfJson = ob_get_contents();
-        ob_clean();
-
-        return $ietfJson;
+        return json_encode($this->koalityFormatter->handle($runResult, false), JSON_PRETTY_PRINT);
     }
 
     private function runSpaceUsedCheck() {
@@ -100,5 +74,15 @@ class DefaultController extends FrontendController
             'orders_per_hour_check',
             'Shows count of orders during the last hour'
         );
+    }
+
+    private function init(){
+        $this->healthFoundation = new HealthFoundation();
+        $this->koalityFormatter = new KoalityFormat();
+
+        $this->spaceUsedCheck = new SpaceUsedCheck();
+        $this->containerIsRunningCheck = new ContainerIsRunningCheck();
+
+        $this->ordersPerHourCheck = new OrdersPerHourCheck();
     }
 }
