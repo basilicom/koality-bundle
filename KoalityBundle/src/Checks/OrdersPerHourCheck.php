@@ -6,14 +6,14 @@ use Leankoala\HealthFoundation\Check\Check;
 use Leankoala\HealthFoundation\Check\Result;
 use Leankoala\HealthFoundation\Check\MetricAwareResult;
 use Pimcore\Bundle\EcommerceFrameworkBundle\Factory;
-use Pimcore\Bundle\EcommerceFrameworkBundle\OrderManager\OrderListItemInterface;
 use \Pimcore\Bundle\EcommerceFrameworkBundle\OrderManager\Order\Listing\Filter\OrderDateTime;
 
 class OrdersPerHourCheck implements Check
 {
     const IDENTIFIER = 'base:sales:perHour';
+
     /**
-     * Checks if the space left on device is sufficient
+     *
      *
      * @return Result
      */
@@ -24,28 +24,15 @@ class OrdersPerHourCheck implements Check
        $result->setObservedValuePrecision(2);
 
        return $result;
-
-
     }
 
-    public function getOrdersCountOfLastHour() {
-
+    public function getOrdersCountOfLastHour(): int
+    {
         $orderManager = Factory::getInstance()->getOrderManager();
         $orderList = $orderManager->createOrderList();
 
-        $orderList->setOrder( 'order.orderDate desc' );
-        $orderList->setLimit( 10, 0 );
-
-
-
-
-        // iterate
-        foreach($orderList as $order)
-        {
-            /* @var \Pimcore\Bundle\EcommerceFrameworkBundle\OrderManager\OrderListItemInterface $order */
-           // echo $order->getId();
-           // echo PHP_EOL;
-        }
+        $query = $orderList->getQuery();
+        $query->where('order.orderdate > ?', time() - 3600);
 
         return count($orderList);
     }
