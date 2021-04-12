@@ -12,8 +12,6 @@ class OrdersPerHourCheck implements Check
     const IDENTIFIER = 'base:sales:perHour';
 
     /**
-     *
-     *
      * @return Result
      */
     public function run()

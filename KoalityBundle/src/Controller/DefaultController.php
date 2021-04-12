@@ -10,6 +10,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Leankoala\HealthFoundation\HealthFoundation as HealthFoundation;
 use Leankoala\HealthFoundation\Check\Device\SpaceUsedCheck;
 use Leankoala\HealthFoundation\Check\Docker\Container\ContainerIsRunningCheck;
+use Leankoala\HealthFoundation\Check\System\UptimeCheck;
 
 class DefaultController extends FrontendController
 {
@@ -18,6 +19,7 @@ class DefaultController extends FrontendController
 
     private SpaceUsedCheck $spaceUsedCheck;
     private ContainerIsRunningCheck $containerIsRunningCheck;
+    private UptimeCheck $uptimeCheck;
 
     private OrdersPerHourCheck $ordersPerHourCheck;
 
@@ -39,8 +41,8 @@ class DefaultController extends FrontendController
     public function runChecks() {
 
         $this->runSpaceUsedCheck();
-        $this->runContainerIsRunningCheck();
         $this->runOrdersPerHourCheck();
+        $this->runServerUptimeCheck();
 
         $runResult = $this->healthFoundation->runHealthCheck();
 
@@ -67,6 +69,16 @@ class DefaultController extends FrontendController
         );
     }
 
+    private function runServerUptimeCheck() {
+        $this->uptimeCheck->init('2 years');
+
+        $this->healthFoundation->registerCheck(
+            $this->uptimeCheck,
+            'server_uptime_check',
+            'Shows the server uptime. Gives warning, if Limit is exceeded.'
+        );
+    }
+
     private function runOrdersPerHourCheck() {
 
         $this->healthFoundation->registerCheck(
@@ -80,8 +92,11 @@ class DefaultController extends FrontendController
         $this->healthFoundation = new HealthFoundation();
         $this->koalityFormatter = new KoalityFormat();
 
+        //HealthFoundationChecks
         $this->spaceUsedCheck = new SpaceUsedCheck();
         $this->containerIsRunningCheck = new ContainerIsRunningCheck();
+        $this->uptimeCheck = new UptimeCheck();
+        //Pimcore eCommerce Framework Checks
 
         $this->ordersPerHourCheck = new OrdersPerHourCheck();
     }
