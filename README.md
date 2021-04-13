@@ -3,7 +3,7 @@
 ### General Information
 This Pimcore Bundle provides an endpoint for the health-check monitoring plugin from https://www.koality.io/de  
 There are 3 Checks already implemented, 2 from the *leankoala/healthfoundation* Bundle, namely **SpaceUsedCheck** and **UptimeCheck**.  
-The 3rd Check, *OrdersPerHourCheck* , is Pimcore eCommerce Framework specific and outputs the count of orders during the last hour.
+The 3rd Check, **OrdersPerHourCheck** , is Pimcore eCommerce Framework specific and outputs the count of orders during the last hour.
 ### Usage
     composer require basilicom/koality-bundle
     
@@ -13,19 +13,13 @@ Make sure to register the Bundle in *AppKernel*, e.g.
         $collection->addBundle(new \Basilicom\KoalityBundle\KoalityBundle());
     }
 
-Once installed the Bundle will provide JSON formatted Data under   
+### How the plugin works
+
+Once installed the Bundle will provide JSON formatted Data under the following endpoint 
 
     yourdomain.tu/koality-status
     
-### Metrics
-
-The following Metrics are implemented yet
-
-- **SpaceUsedCheck** - this check fails if the amount of space left on device is below 5% .
-- **UptimeCheck** - this check fails if the defined uptime is exceeded (1 year per Default).
-- **OrdersPerHourCheck** - this check measures the number of orders in the past hour.
-
-### Example JSON Output
+##### Example JSON Output
 
 ```
 {
@@ -64,9 +58,18 @@ The following Metrics are implemented yet
 }
 ```
 
+### Metrics
+
+The following Metrics are implemented yet
+
+- **SpaceUsedCheck** - this check fails if the amount of space left on device is below 5% .
+- **UptimeCheck** - this check fails if the defined uptime is exceeded (1 year per Default).
+- **OrdersPerHourCheck** - this check measures the number of orders in the past hour.
+
+
 ### TODO
 
 Add more Pimcore eCommerce Specific Metrics like 
 - Minimum number of active products (to detect import failures)
-- Add possibility to configure the individual test (via xml config file?)
+- Add possibility to configure the individual tests (via xml config file?)
 - tbc.

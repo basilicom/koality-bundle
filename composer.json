@@ -1,6 +1,6 @@
 {
   "name": "basilicom/koality-bundle",
-  "description": "description",
+  "description": "This Pimcore Bundle can be used to send metrics to koality.io",
   "type": "pimcore-bundle",
   "license": "MIT",
   "autoload": {
