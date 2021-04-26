@@ -24,5 +24,11 @@ class KoalityExtension extends Extension
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
+
+        $controllerDefinition = $container->getDefinition('Basilicom\KoalityBundle\Controller\DefaultController');
+        $arguments = [
+            '$config' => $config
+        ];
+        $controllerDefinition->setArguments($arguments);
     }
 }

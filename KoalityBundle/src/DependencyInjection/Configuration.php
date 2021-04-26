@@ -17,12 +17,16 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('koality');
-
-        // Here you should define the parameters that are allowed to
-        // configure your bundle. See the documentation linked above for
-        // more information on that topic.
+        $treeBuilder = new TreeBuilder('koality');
+        $treeBuilder->getRootNode()
+            ->children()
+                ->arrayNode('orders_check')
+                    ->children()
+                        ->integerNode('hours')->end()
+                    ->end()
+                ->end() //orders_check
+            ->end()
+        ;
 
         return $treeBuilder;
     }

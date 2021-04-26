@@ -2,7 +2,7 @@
 
 namespace Basilicom\KoalityBundle\Controller;
 
-use Basilicom\KoalityBundle\Checks\OrdersPerHourCheck;
+use Basilicom\KoalityBundle\Checks\OrdersPerTimeIntervalCheck;
 use Leankoala\HealthFoundation\Result\Format\Koality\KoalityFormat as KoalityFormat;
 use Pimcore\Controller\FrontendController;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,13 +21,23 @@ class DefaultController extends FrontendController
     private ContainerIsRunningCheck $containerIsRunningCheck;
     private UptimeCheck $uptimeCheck;
 
-    private OrdersPerHourCheck $ordersPerHourCheck;
+    private OrdersPerTimeIntervalCheck $ordersPerTimeIntervalCheck;
+
+    private array $config;
+
+    public function __construct($config)
+    {
+      $this->config = $config;
+    }
 
     /**
      * @Route("/koality-status")
      */
     public function indexAction()
     {
+
+       // dump($this->config['orders_check']['hours']);die;
+
         $this->init();
 
         $response = new Response();
@@ -35,13 +45,14 @@ class DefaultController extends FrontendController
         $response->headers->set('Content-Type', 'application/health+json');
         $response->send();
 
+
         return $response;
     }
 
     public function runChecks() {
 
         $this->runSpaceUsedCheck();
-        $this->runOrdersPerHourCheck();
+        $this->runOrdersPerTimeIntervalCheck();
         $this->runServerUptimeCheck();
 
         $runResult = $this->healthFoundation->runHealthCheck();
@@ -79,12 +90,14 @@ class DefaultController extends FrontendController
         );
     }
 
-    private function runOrdersPerHourCheck() {
+    private function runOrdersPerTimeIntervalCheck() {
+        $hours = $this->config['orders_check']['hours'];
+        $this->ordersPerTimeIntervalCheck->init($hours);
 
         $this->healthFoundation->registerCheck(
-            $this->ordersPerHourCheck,
-            'orders_per_hour_check',
-            'Shows count of orders during the last hour'
+            $this->ordersPerTimeIntervalCheck,
+            'orders_per_time_interval',
+            'Shows count of orders during the last ' .$hours . ' hour(s)'
         );
     }
 
@@ -98,6 +111,6 @@ class DefaultController extends FrontendController
         $this->uptimeCheck = new UptimeCheck();
         //Pimcore eCommerce Framework Checks
 
-        $this->ordersPerHourCheck = new OrdersPerHourCheck();
+        $this->ordersPerTimeIntervalCheck = new OrdersPerTimeIntervalCheck();
     }
 }
