@@ -60,8 +60,15 @@ class DefaultController extends FrontendController
 
     private function runServerChecks()
     {
-        $this->runSpaceUsedCheck();
-        $this->runServerUptimeCheck();
+        if ($this->config[Configuration::SPACE_USED_CHECK][Configuration::ENABLE] == true) {
+            $this->runSpaceUsedCheck();
+        }
+        if ($this->config[Configuration::SERVER_UPTIME_CHECK][Configuration::ENABLE] == true) {
+            $this->runServerUptimeCheck();
+        }
+        if ($this->config[Configuration::CONTAINER_IS_RUNNING_CHECK][Configuration::ENABLE] == true) {
+            $this->runContainerIsRunningCheck();
+        }
 
         $runResult = $this->healthFoundation->runHealthCheck();
 
@@ -70,7 +77,11 @@ class DefaultController extends FrontendController
 
     private function runBusinessChecks()
     {
-        $this->runOrdersPerTimeIntervalCheck();
+        //TODO Überlegen welche Response geliefert wird, wenn keine Metrik aktiviert wurde
+        if ($this->config[Configuration::ORDERS_PER_TIME_INTERVAL_CHECK][Configuration::ENABLE] == true) {
+            $this->runOrdersPerTimeIntervalCheck();
+        }
+
         $runResult = $this->healthFoundation->runHealthCheck();
 
         return json_encode($this->koalityFormatter->handle($runResult, false), JSON_PRETTY_PRINT);
@@ -114,7 +125,7 @@ class DefaultController extends FrontendController
 
     private function runOrdersPerTimeIntervalCheck()
     {
-        $hours = $this->config[Configuration::ORDERS_CHECK][Configuration::HOURS];
+        $hours = $this->config[Configuration::ORDERS_PER_TIME_INTERVAL_CHECK][Configuration::HOURS];
         $this->ordersPerTimeIntervalCheck->init($hours);
 
         $this->healthFoundation->registerCheck(

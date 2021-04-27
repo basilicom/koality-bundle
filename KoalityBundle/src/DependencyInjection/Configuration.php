@@ -14,7 +14,7 @@ class Configuration implements ConfigurationInterface
 {
 
     public const KOALITY = 'koality';
-    public const ORDERS_CHECK = 'orders_check';
+    public const ORDERS_PER_TIME_INTERVAL_CHECK = 'orders_per_time_interval_check';
     public const HOURS = 'hours';
     public const SERVER_UPTIME_CHECK = 'server_uptime_check';
     public const TIME_INTERVAL = 'time_interval';
@@ -22,6 +22,7 @@ class Configuration implements ConfigurationInterface
     public const LIMIT_IN_PERCENT = 'limit_in_percent';
     public const CONTAINER_IS_RUNNING_CHECK = 'container_is_running_check';
     public const CONTAINER_NAME = 'container_name';
+    public const ENABLE = 'enable';
 
 
     /**
@@ -32,23 +33,27 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder(self::KOALITY);
         $treeBuilder->getRootNode()
             ->children()
-                ->arrayNode(self::ORDERS_CHECK)
+                ->arrayNode(self::ORDERS_PER_TIME_INTERVAL_CHECK)
                     ->children()
+                        ->booleanNode(self::ENABLE)->end()
                         ->integerNode(self::HOURS)->end()
                     ->end()
                 ->end() //ORDERS_CHECK
                 ->arrayNode(self::SERVER_UPTIME_CHECK)
                     ->children()
+                        ->booleanNode(self::ENABLE)->end()
                         ->scalarNode(self::TIME_INTERVAL)->end()
                     ->end()
                 ->end() //SERVER_UPTIME_CHECK
                 ->arrayNode(self::SPACE_USED_CHECK)
                     ->children()
+                        ->booleanNode(self::ENABLE)->end()
                         ->integerNode(self::LIMIT_IN_PERCENT)->end()
                     ->end()
                 ->end() //SPACE_USED_CHECK
                 ->arrayNode(self::CONTAINER_IS_RUNNING_CHECK)
                     ->children()
+                        ->booleanNode(self::ENABLE)->end()
                         ->scalarNode(self::CONTAINER_NAME)->end()
                     ->end()
                 ->end() //CONTAINER_IS_RUNNING_CHECK
