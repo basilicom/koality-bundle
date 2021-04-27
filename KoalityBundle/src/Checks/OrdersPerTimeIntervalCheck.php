@@ -3,8 +3,8 @@
 namespace Basilicom\KoalityBundle\Checks;
 
 use Leankoala\HealthFoundation\Check\Check;
-use Leankoala\HealthFoundation\Check\Result;
 use Leankoala\HealthFoundation\Check\MetricAwareResult;
+use Leankoala\HealthFoundation\Check\Result;
 use Pimcore\Bundle\EcommerceFrameworkBundle\Factory;
 
 class OrdersPerTimeIntervalCheck implements Check
@@ -13,7 +13,8 @@ class OrdersPerTimeIntervalCheck implements Check
 
     private int $timeInterval;
 
-    public function init(int $timeInterval) {
+    public function init(int $timeInterval)
+    {
         $this->timeInterval = $timeInterval;
     }
 
@@ -22,11 +23,11 @@ class OrdersPerTimeIntervalCheck implements Check
      */
     public function run()
     {
-       $result = new MetricAwareResult(Result::STATUS_PASS, 'Count of orders during the specified time interval');
-       $result->setMetric($this->getOrdersCount(), 'Orders', MetricAwareResult::METRIC_TYPE_NUMERIC);
-       $result->setObservedValuePrecision(2);
+        $result = new MetricAwareResult(Result::STATUS_PASS, 'Count of orders during the specified time interval');
+        $result->setMetric($this->getOrdersCount(), 'Orders', MetricAwareResult::METRIC_TYPE_NUMERIC);
+        $result->setObservedValuePrecision(2);
 
-       return $result;
+        return $result;
     }
 
     public function getOrdersCount(): int

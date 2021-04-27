@@ -12,19 +12,46 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
+
+    public const KOALITY = 'koality';
+    public const ORDERS_CHECK = 'orders_check';
+    public const HOURS = 'hours';
+    public const SERVER_UPTIME_CHECK = 'server_uptime_check';
+    public const TIME_INTERVAL = 'time_interval';
+    public const SPACE_USED_CHECK = 'space_used_check';
+    public const LIMIT_IN_PERCENT = 'limit_in_percent';
+    public const CONTAINER_IS_RUNNING_CHECK = 'container_is_running_check';
+    public const CONTAINER_NAME = 'container_name';
+
+
     /**
      * {@inheritdoc}
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder('koality');
+        $treeBuilder = new TreeBuilder(self::KOALITY);
         $treeBuilder->getRootNode()
             ->children()
-                ->arrayNode('orders_check')
+                ->arrayNode(self::ORDERS_CHECK)
                     ->children()
-                        ->integerNode('hours')->end()
+                        ->integerNode(self::HOURS)->end()
                     ->end()
-                ->end() //orders_check
+                ->end() //ORDERS_CHECK
+                ->arrayNode(self::SERVER_UPTIME_CHECK)
+                    ->children()
+                        ->scalarNode(self::TIME_INTERVAL)->end()
+                    ->end()
+                ->end() //SERVER_UPTIME_CHECK
+                ->arrayNode(self::SPACE_USED_CHECK)
+                    ->children()
+                        ->integerNode(self::LIMIT_IN_PERCENT)->end()
+                    ->end()
+                ->end() //SPACE_USED_CHECK
+                ->arrayNode(self::CONTAINER_IS_RUNNING_CHECK)
+                    ->children()
+                        ->scalarNode(self::CONTAINER_NAME)->end()
+                    ->end()
+                ->end() //CONTAINER_IS_RUNNING_CHECK
             ->end()
         ;
 

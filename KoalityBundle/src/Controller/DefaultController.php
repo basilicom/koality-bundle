@@ -3,14 +3,15 @@
 namespace Basilicom\KoalityBundle\Controller;
 
 use Basilicom\KoalityBundle\Checks\OrdersPerTimeIntervalCheck;
+use Basilicom\KoalityBundle\DependencyInjection\Configuration;
+use Leankoala\HealthFoundation\Check\Device\SpaceUsedCheck;
+use Leankoala\HealthFoundation\Check\Docker\Container\ContainerIsRunningCheck;
+use Leankoala\HealthFoundation\Check\System\UptimeCheck;
+use Leankoala\HealthFoundation\HealthFoundation as HealthFoundation;
 use Leankoala\HealthFoundation\Result\Format\Koality\KoalityFormat as KoalityFormat;
 use Pimcore\Controller\FrontendController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Leankoala\HealthFoundation\HealthFoundation as HealthFoundation;
-use Leankoala\HealthFoundation\Check\Device\SpaceUsedCheck;
-use Leankoala\HealthFoundation\Check\Docker\Container\ContainerIsRunningCheck;
-use Leankoala\HealthFoundation\Check\System\UptimeCheck;
 
 class DefaultController extends FrontendController
 {
@@ -27,32 +28,39 @@ class DefaultController extends FrontendController
 
     public function __construct($config)
     {
-      $this->config = $config;
+        $this->config = $config;
+        $this->init();
     }
 
     /**
-     * @Route("/koality-status")
+     * @Route("/pimcore-koality-bundle-server")
      */
-    public function indexAction()
+    public function serverChecksAction()
     {
-
-       // dump($this->config['orders_check']['hours']);die;
-
-        $this->init();
-
         $response = new Response();
-        $response->setContent($this->runChecks());
+        $response->setContent($this->runServerChecks());
         $response->headers->set('Content-Type', 'application/health+json');
         $response->send();
-
 
         return $response;
     }
 
-    public function runChecks() {
+    /**
+     * @Route("/pimcore-koality-bundle-business")
+     */
+    public function businessChecksAction()
+    {
+        $response = new Response();
+        $response->setContent($this->runBusinessChecks());
+        $response->headers->set('Content-Type', 'application/health+json');
+        $response->send();
 
+        return $response;
+    }
+
+    private function runServerChecks()
+    {
         $this->runSpaceUsedCheck();
-        $this->runOrdersPerTimeIntervalCheck();
         $this->runServerUptimeCheck();
 
         $runResult = $this->healthFoundation->runHealthCheck();
@@ -60,48 +68,64 @@ class DefaultController extends FrontendController
         return json_encode($this->koalityFormatter->handle($runResult, false), JSON_PRETTY_PRINT);
     }
 
-    private function runSpaceUsedCheck() {
-        $this->spaceUsedCheck->init(95);
+    private function runBusinessChecks()
+    {
+        $this->runOrdersPerTimeIntervalCheck();
+        $runResult = $this->healthFoundation->runHealthCheck();
+
+        return json_encode($this->koalityFormatter->handle($runResult, false), JSON_PRETTY_PRINT);
+    }
+
+    private function runSpaceUsedCheck()
+    {
+        $limitInPercent = $this->config[Configuration::SPACE_USED_CHECK][Configuration::LIMIT_IN_PERCENT];
+        $this->spaceUsedCheck->init($limitInPercent);
 
         $this->healthFoundation->registerCheck(
             $this->spaceUsedCheck,
             'space_used_check',
-            'Space used on storage server'
+            'Space used on storage server. Limit is set to ' . $limitInPercent . ' percent'
         );
     }
 
-    private function runContainerIsRunningCheck() {
-        $this->containerIsRunningCheck->init('koality_bundle_skeleton_php-fpm_1');
+    private function runContainerIsRunningCheck()
+    {
+        $containerName = $this->config[Configuration::CONTAINER_IS_RUNNING_CHECK][Configuration::CONTAINER_NAME];
+        $this->containerIsRunningCheck->init($containerName);
 
         $this->healthFoundation->registerCheck(
             $this->containerIsRunningCheck,
             'container_is_running_check',
-            'Is the Docker Container still running?'
+            'Is the Docker Container - ' . $containerName . ' - still running?'
         );
     }
 
-    private function runServerUptimeCheck() {
-        $this->uptimeCheck->init('2 years');
+    private function runServerUptimeCheck()
+    {
+        $serverUptimeLimit = $this->config[Configuration::SERVER_UPTIME_CHECK][Configuration::TIME_INTERVAL];
+        $this->uptimeCheck->init($serverUptimeLimit);
 
         $this->healthFoundation->registerCheck(
             $this->uptimeCheck,
             'server_uptime_check',
-            'Shows the server uptime. Gives warning, if Limit is exceeded.'
+            'Shows the server uptime. Gives warning, if Limit of ' . $serverUptimeLimit . ' is exceeded.'
         );
     }
 
-    private function runOrdersPerTimeIntervalCheck() {
-        $hours = $this->config['orders_check']['hours'];
+    private function runOrdersPerTimeIntervalCheck()
+    {
+        $hours = $this->config[Configuration::ORDERS_CHECK][Configuration::HOURS];
         $this->ordersPerTimeIntervalCheck->init($hours);
 
         $this->healthFoundation->registerCheck(
             $this->ordersPerTimeIntervalCheck,
             'orders_per_time_interval',
-            'Shows count of orders during the last ' .$hours . ' hour(s)'
+            'Shows count of orders during the last ' . $hours . ' hour(s)'
         );
     }
 
-    private function init(){
+    private function init()
+    {
         $this->healthFoundation = new HealthFoundation();
         $this->koalityFormatter = new KoalityFormat();
 
