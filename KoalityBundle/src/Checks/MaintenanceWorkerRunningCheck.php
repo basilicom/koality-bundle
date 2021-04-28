@@ -2,6 +2,7 @@
 
 namespace Basilicom\KoalityBundle\Checks;
 
+use CustomerManagementFrameworkBundle\Maintenance\MaintenanceWorker;
 use Leankoala\HealthFoundation\Check\Check;
 use Leankoala\HealthFoundation\Check\Result;
 
@@ -14,6 +15,7 @@ class MaintenanceWorkerRunningCheck implements Check
      */
     public function run()
     {
+        $worker = new ();
 
             $result = new Result(Result::STATUS_FAIL, 'Debug mode is ON');
 

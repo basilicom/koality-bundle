@@ -15,9 +15,9 @@ services:
         resource: '../../Controller'
         public: true
         tags: ['controller.service_arguments']
-    
-    
+        
     # Autowiring Pimcore-Business Checks
     Basilicom\KoalityBundle\Checks\DebugModeEnabledCheck: ~
     Basilicom\KoalityBundle\Checks\OrdersPerTimeIntervalCheck: ~
+    Basilicom\KoalityBundle\Checks\MaintenanceWorkerRunningCheck: ~
 

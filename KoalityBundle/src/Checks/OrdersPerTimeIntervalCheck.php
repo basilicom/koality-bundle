@@ -26,17 +26,20 @@ class OrdersPerTimeIntervalCheck implements Check
     public function run()
     {
         $ordersCount = $this->getOrdersCount();
+
         if ($ordersCount >= $this->threshold) {
             $result = new MetricAwareResult(
                 Result::STATUS_PASS,
-                'Count of orders during the specified time interval. Threshold: ' . $this->threshold );
+                'Count of orders during the specified time interval. Threshold: ' . $this->threshold
+            );
             $result->setMetric($ordersCount, 'Orders', MetricAwareResult::METRIC_TYPE_NUMERIC);
             $result->setObservedValuePrecision(2);
         }
         if ($ordersCount < $this->threshold) {
             $result = new MetricAwareResult(
                 Result::STATUS_FAIL,
-                'Count of orders during the specified time interval. Threshold: ' . $this->threshold );
+                'Count of orders during the specified time interval. Threshold: ' . $this->threshold
+            );
             $result->setMetric($ordersCount, 'Orders', MetricAwareResult::METRIC_TYPE_NUMERIC);
             $result->setObservedValuePrecision(2);
         }

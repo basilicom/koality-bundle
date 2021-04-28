@@ -17,8 +17,11 @@ class DebugModeEnabledCheck implements Check
         if (boolval(\Pimcore::inDebugMode()) === true) {
             $result = new Result(Result::STATUS_FAIL, 'Debug mode is ON');
         }
-        if (boolval(\Pimcore::inDebugMode()) === false) {
+        elseif (boolval(\Pimcore::inDebugMode()) === false) {
             $result = new Result(Result::STATUS_PASS, 'Debug mode is OFF');
+        }
+        else {
+            $result = new Result(Result::STATUS_WARN, 'Debug mode state could not be determined');
         }
 
         return $result;
