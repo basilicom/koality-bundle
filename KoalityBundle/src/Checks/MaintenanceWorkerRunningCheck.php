@@ -24,15 +24,14 @@ class MaintenanceWorkerRunningCheck implements Check
     {
         $maintenance_active = false;
         if ($lastExecution = $this->maintenanceExecutor->getLastExecution()) {
-            if ((time(
-                    ) - $lastExecution) < 3660) { // maintenance script should run at least every hour + a little tolerance
+            if ((time() - $lastExecution) < 3660) { // maintenance script should run at least every hour + a little tolerance
                 $maintenance_active = true;
             }
         }
         if ($maintenance_active === true) {
             $result = new Result(Result::STATUS_PASS, 'Maintenance Job was executed within the last hour');
         } else {
-            $result = new Result(Result::STATUS_FAIL, 'Maintenance Job wasnt executed within the last hour');
+            $result = new Result(Result::STATUS_FAIL, 'Maintenance Job wasn\'t executed within the last hour');
         }
 
         return $result;
