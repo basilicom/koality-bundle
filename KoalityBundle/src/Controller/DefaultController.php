@@ -137,7 +137,8 @@ class DefaultController extends FrontendController
     private function runOrdersPerTimeIntervalCheck()
     {
         $hours = $this->config[Configuration::ORDERS_PER_TIME_INTERVAL_CHECK][Configuration::HOURS];
-        $this->ordersPerTimeIntervalCheck->init($hours);
+        $threshold = $this->config[Configuration::ORDERS_PER_TIME_INTERVAL_CHECK][Configuration::THRESHOLD];
+        $this->ordersPerTimeIntervalCheck->init($hours, $threshold);
 
         $this->healthFoundation->registerCheck(
             $this->ordersPerTimeIntervalCheck,
@@ -164,6 +165,5 @@ class DefaultController extends FrontendController
         $this->spaceUsedCheck = new SpaceUsedCheck();
         $this->containerIsRunningCheck = new ContainerIsRunningCheck();
         $this->uptimeCheck = new UptimeCheck();
-
     }
 }

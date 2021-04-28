@@ -12,10 +12,12 @@ class OrdersPerTimeIntervalCheck implements Check
     const IDENTIFIER = 'base:sales:perHour';
 
     private int $timeInterval;
+    private int $threshold;
 
-    public function init(int $timeInterval)
+    public function init(int $timeInterval, int $threshold)
     {
         $this->timeInterval = $timeInterval;
+        $this->threshold = $threshold;
     }
 
     /**
@@ -23,9 +25,21 @@ class OrdersPerTimeIntervalCheck implements Check
      */
     public function run()
     {
-        $result = new MetricAwareResult(Result::STATUS_PASS, 'Count of orders during the specified time interval');
-        $result->setMetric($this->getOrdersCount(), 'Orders', MetricAwareResult::METRIC_TYPE_NUMERIC);
-        $result->setObservedValuePrecision(2);
+        $ordersCount = $this->getOrdersCount();
+        if ($ordersCount >= $this->threshold) {
+            $result = new MetricAwareResult(
+                Result::STATUS_PASS,
+                'Count of orders during the specified time interval. Threshold: ' . $this->threshold );
+            $result->setMetric($ordersCount, 'Orders', MetricAwareResult::METRIC_TYPE_NUMERIC);
+            $result->setObservedValuePrecision(2);
+        }
+        if ($ordersCount < $this->threshold) {
+            $result = new MetricAwareResult(
+                Result::STATUS_FAIL,
+                'Count of orders during the specified time interval. Threshold: ' . $this->threshold );
+            $result->setMetric($ordersCount, 'Orders', MetricAwareResult::METRIC_TYPE_NUMERIC);
+            $result->setObservedValuePrecision(2);
+        }
 
         return $result;
     }

@@ -12,12 +12,12 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-
     public const KOALITY = 'koality';
     public const ENABLE = 'enable';
 
     public const ORDERS_PER_TIME_INTERVAL_CHECK = 'orders_per_time_interval_check';
     public const HOURS = 'hours';
+    public const THRESHOLD = 'threshold';
     public const SERVER_UPTIME_CHECK = 'server_uptime_check';
     public const TIME_INTERVAL = 'time_interval';
     public const SPACE_USED_CHECK = 'space_used_check';
@@ -40,6 +40,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->booleanNode(self::ENABLE)->end()
                         ->integerNode(self::HOURS)->end()
+                        ->integerNode(self::THRESHOLD)->end()
                     ->end()
                 ->end() //ORDERS_PER_TIME_INTERVAL_CHECK
                 ->arrayNode(self::DEBUG_MODE_ENABLED_CHECK)
