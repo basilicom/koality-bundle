@@ -25,8 +25,7 @@ class Configuration implements ConfigurationInterface
     public const CONTAINER_IS_RUNNING_CHECK = 'container_is_running_check';
     public const CONTAINER_NAME = 'container_name';
     public const DEBUG_MODE_ENABLED_CHECK = 'debug_mode_enabled_check';
-
-
+    public const MAINTENANCE_WORKER_RUNNING_CHECK = 'maintenance_worker_running_check';
 
     /**
      * {@inheritdoc}
@@ -48,6 +47,11 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode(self::ENABLE)->end()
                     ->end()
                 ->end() //DEBUG_MODE_ENABLED_CHECK
+                ->arrayNode(self::MAINTENANCE_WORKER_RUNNING_CHECK)
+                    ->children()
+                        ->booleanNode(self::ENABLE)->end()
+                    ->end()
+                ->end() //MAINTENANCE_WORKER_RUNNING_CHECK
                 ->arrayNode(self::SERVER_UPTIME_CHECK)
                     ->children()
                         ->booleanNode(self::ENABLE)->end()

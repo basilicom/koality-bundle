@@ -9,6 +9,8 @@ use Basilicom\KoalityBundle\DependencyInjection\Configuration;
 use Leankoala\HealthFoundation\HealthFoundation as HealthFoundation;
 use Leankoala\HealthFoundation\Result\Format\Koality\KoalityFormat as KoalityFormat;
 use Pimcore\Controller\FrontendController;
+use Pimcore\Maintenance\Executor;
+use Pimcore\Maintenance\ExecutorInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -16,6 +18,7 @@ class BusinessMetricsController extends FrontendController
 {
     private HealthFoundation $healthFoundation;
     private KoalityFormat  $koalityFormatter;
+    private ExecutorInterface $maintenanceExecutor;
 
     private OrdersPerTimeIntervalCheck $ordersPerTimeIntervalCheck;
     private DebugModeEnabledCheck $debugModeEnabledCheck;
@@ -27,12 +30,15 @@ class BusinessMetricsController extends FrontendController
         $config,
         OrdersPerTimeIntervalCheck $ordersPerTimeIntervalCheck,
         DebugModeEnabledCheck $debugModeEnabledCheck,
-        MaintenanceWorkerRunningCheck $maintenanceWorkerRunningCheck
+        MaintenanceWorkerRunningCheck $maintenanceWorkerRunningCheck,
+        Executor $maintenanceExecutor
+
     ) {
         $this->config = $config;
         $this->ordersPerTimeIntervalCheck = $ordersPerTimeIntervalCheck;
         $this->debugModeEnabledCheck = $debugModeEnabledCheck;
         $this->maintenanceWorkerRunningCheck = $maintenanceWorkerRunningCheck;
+        $this->maintenanceExecutor = $maintenanceExecutor;
         $this->init();
     }
 
@@ -57,6 +63,9 @@ class BusinessMetricsController extends FrontendController
         }
         if ($this->config[Configuration::DEBUG_MODE_ENABLED_CHECK][Configuration::ENABLE] === true) {
             $this->runDebugModeEnabledCheck();
+        }
+        if ($this->config[Configuration::MAINTENANCE_WORKER_RUNNING_CHECK][Configuration::ENABLE] === true) {
+            $this->runMaintenanceWorkerRunningCheck();
         }
 
         $runResult = $this->healthFoundation->runHealthCheck();
@@ -83,6 +92,17 @@ class BusinessMetricsController extends FrontendController
             $this->debugModeEnabledCheck,
             'debug_mode_enabled_check',
             'Indicates whether debug mode is enabled.'
+        );
+    }
+
+    private function runMaintenanceWorkerRunningCheck()
+    {
+        $this->maintenanceWorkerRunningCheck->init($this->maintenanceExecutor);
+
+        $this->healthFoundation->registerCheck(
+            $this->maintenanceWorkerRunningCheck,
+            'maintenance_worker_running_check',
+            'Indicates whether maintenance jobs where running within last hour'
         );
     }
 
