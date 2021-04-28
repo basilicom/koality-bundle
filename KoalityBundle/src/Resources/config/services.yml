@@ -15,10 +15,9 @@ services:
         resource: '../../Controller'
         public: true
         tags: ['controller.service_arguments']
+    
+    
+    # Autowiring Pimcore-Business Checks
+    Basilicom\KoalityBundle\Checks\DebugModeEnabledCheck: ~
+    Basilicom\KoalityBundle\Checks\OrdersPerTimeIntervalCheck: ~
 
-# add more services, or override services that need manual wiring
-#    Basilicom\KoalityBundle\ExampleClass:
-#        arguments:
-#            - "@service_id"
-#            - "plain_value"
-#            - "%parameter%"

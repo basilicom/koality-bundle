@@ -14,6 +14,8 @@ class Configuration implements ConfigurationInterface
 {
 
     public const KOALITY = 'koality';
+    public const ENABLE = 'enable';
+
     public const ORDERS_PER_TIME_INTERVAL_CHECK = 'orders_per_time_interval_check';
     public const HOURS = 'hours';
     public const SERVER_UPTIME_CHECK = 'server_uptime_check';
@@ -22,7 +24,8 @@ class Configuration implements ConfigurationInterface
     public const LIMIT_IN_PERCENT = 'limit_in_percent';
     public const CONTAINER_IS_RUNNING_CHECK = 'container_is_running_check';
     public const CONTAINER_NAME = 'container_name';
-    public const ENABLE = 'enable';
+    public const DEBUG_MODE_ENABLED_CHECK = 'debug_mode_enabled_check';
+
 
 
     /**
@@ -38,7 +41,12 @@ class Configuration implements ConfigurationInterface
                         ->booleanNode(self::ENABLE)->end()
                         ->integerNode(self::HOURS)->end()
                     ->end()
-                ->end() //ORDERS_CHECK
+                ->end() //ORDERS_PER_TIME_INTERVAL_CHECK
+                ->arrayNode(self::DEBUG_MODE_ENABLED_CHECK)
+                    ->children()
+                        ->booleanNode(self::ENABLE)->end()
+                    ->end()
+                ->end() //DEBUG_MODE_ENABLED_CHECK
                 ->arrayNode(self::SERVER_UPTIME_CHECK)
                     ->children()
                         ->booleanNode(self::ENABLE)->end()

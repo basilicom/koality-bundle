@@ -3,6 +3,7 @@
 namespace Basilicom\KoalityBundle\Controller;
 
 use Basilicom\KoalityBundle\Checks\OrdersPerTimeIntervalCheck;
+use Basilicom\KoalityBundle\Checks\DebugModeEnabledCheck;
 use Basilicom\KoalityBundle\DependencyInjection\Configuration;
 use Leankoala\HealthFoundation\Check\Device\SpaceUsedCheck;
 use Leankoala\HealthFoundation\Check\Docker\Container\ContainerIsRunningCheck;
@@ -23,12 +24,19 @@ class DefaultController extends FrontendController
     private UptimeCheck $uptimeCheck;
 
     private OrdersPerTimeIntervalCheck $ordersPerTimeIntervalCheck;
+    private DebugModeEnabledCheck $debugModeEnabledCheck;
 
     private array $config;
 
-    public function __construct($config)
+    public function __construct(
+        $config,
+        OrdersPerTimeIntervalCheck $ordersPerTimeIntervalCheck,
+        DebugModeEnabledCheck  $debugModeEnabledCheck
+    )
     {
         $this->config = $config;
+        $this->ordersPerTimeIntervalCheck = $ordersPerTimeIntervalCheck;
+        $this->debugModeEnabledCheck = $debugModeEnabledCheck;
         $this->init();
     }
 
@@ -60,13 +68,13 @@ class DefaultController extends FrontendController
 
     private function runServerChecks()
     {
-        if ($this->config[Configuration::SPACE_USED_CHECK][Configuration::ENABLE] == true) {
+        if ($this->config[Configuration::SPACE_USED_CHECK][Configuration::ENABLE] === true) {
             $this->runSpaceUsedCheck();
         }
-        if ($this->config[Configuration::SERVER_UPTIME_CHECK][Configuration::ENABLE] == true) {
+        if ($this->config[Configuration::SERVER_UPTIME_CHECK][Configuration::ENABLE] === true) {
             $this->runServerUptimeCheck();
         }
-        if ($this->config[Configuration::CONTAINER_IS_RUNNING_CHECK][Configuration::ENABLE] == true) {
+        if ($this->config[Configuration::CONTAINER_IS_RUNNING_CHECK][Configuration::ENABLE] === true) {
             $this->runContainerIsRunningCheck();
         }
 
@@ -78,8 +86,11 @@ class DefaultController extends FrontendController
     private function runBusinessChecks()
     {
         //TODO Überlegen welche Response geliefert wird, wenn keine Metrik aktiviert wurde
-        if ($this->config[Configuration::ORDERS_PER_TIME_INTERVAL_CHECK][Configuration::ENABLE] == true) {
+        if ($this->config[Configuration::ORDERS_PER_TIME_INTERVAL_CHECK][Configuration::ENABLE] === true) {
             $this->runOrdersPerTimeIntervalCheck();
+        }
+        if ($this->config[Configuration::DEBUG_MODE_ENABLED_CHECK][Configuration::ENABLE] === true) {
+            $this->runDebugModeEnabledCheck();
         }
 
         $runResult = $this->healthFoundation->runHealthCheck();
@@ -135,6 +146,15 @@ class DefaultController extends FrontendController
         );
     }
 
+    private function runDebugModeEnabledCheck()
+    {
+        $this->healthFoundation->registerCheck(
+            $this->debugModeEnabledCheck,
+            'debug_mode_enabled_check',
+            'Indicates whether debug mode is enabled.'
+        );
+    }
+
     private function init()
     {
         $this->healthFoundation = new HealthFoundation();
@@ -144,8 +164,6 @@ class DefaultController extends FrontendController
         $this->spaceUsedCheck = new SpaceUsedCheck();
         $this->containerIsRunningCheck = new ContainerIsRunningCheck();
         $this->uptimeCheck = new UptimeCheck();
-        //Pimcore eCommerce Framework Checks
 
-        $this->ordersPerTimeIntervalCheck = new OrdersPerTimeIntervalCheck();
     }
 }
