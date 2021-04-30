@@ -18,6 +18,7 @@ class Configuration implements ConfigurationInterface
     public const ORDERS_PER_TIME_INTERVAL_CHECK = 'orders_per_time_interval_check';
     public const HOURS = 'hours';
     public const THRESHOLD = 'threshold';
+    public const NEW_CARTS_PER_TIME_INTERVAL_CHECK = 'new_carts_per_time_interval_check';
     public const SERVER_UPTIME_CHECK = 'server_uptime_check';
     public const TIME_INTERVAL = 'time_interval';
     public const SPACE_USED_CHECK = 'space_used_check';
@@ -42,6 +43,12 @@ class Configuration implements ConfigurationInterface
                         ->integerNode(self::THRESHOLD)->end()
                     ->end()
                 ->end() //ORDERS_PER_TIME_INTERVAL_CHECK
+                ->arrayNode(self::NEW_CARTS_PER_TIME_INTERVAL_CHECK)
+                    ->children()
+                        ->booleanNode(self::ENABLE)->end()
+                        ->integerNode(self::HOURS)->end()
+                    ->end()
+                ->end() //NEW_CARTS_PER_TIME_INTERVAL_CHECK
                 ->arrayNode(self::DEBUG_MODE_ENABLED_CHECK)
                     ->children()
                         ->booleanNode(self::ENABLE)->end()

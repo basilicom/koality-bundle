@@ -47,6 +47,8 @@ class OrdersPerTimeIntervalCheck implements Check
         return $result;
     }
 
+
+    //TODO Check ob eCommerceFra
     public function getOrdersCount(): int
     {
         $orderManager = Factory::getInstance()->getOrderManager();
