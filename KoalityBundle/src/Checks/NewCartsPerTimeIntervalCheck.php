@@ -22,13 +22,13 @@ class NewCartsPerTimeIntervalCheck implements Check
      */
     public function run()
     {
-        $oneHourAgo = time()-3600;
+        $timeInterval = time() - 3600 * $this->timeInterval;
 
         $db = \Pimcore\Db::get();
         $queryResult = $db->fetchAll('
             SELECT COUNT(*) 
             FROM ecommerceframework_cart 
-            WHERE creationDateTimestamp >= ' . $oneHourAgo);
+            WHERE creationDateTimestamp >= ' . $timeInterval);
 
         if (!empty($queryResult)) {
             $countOfCarts = $queryResult[0]['COUNT(*)'];
@@ -41,11 +41,8 @@ class NewCartsPerTimeIntervalCheck implements Check
         $result->setMetric( $countOfCarts, 'Carts', MetricAwareResult::METRIC_TYPE_NUMERIC);
         $result->setObservedValuePrecision(2);
 
-
         return $result;
     }
-
-
 
     public function getIdentifier()
     {

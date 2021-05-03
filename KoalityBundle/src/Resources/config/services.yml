@@ -18,7 +18,6 @@ services:
         
     # Autowiring Pimcore-Business Checks
     Basilicom\KoalityBundle\Checks\DebugModeEnabledCheck: ~
-    Basilicom\KoalityBundle\Checks\OrdersPerTimeIntervalCheck: ~
     Basilicom\KoalityBundle\Checks\MaintenanceWorkerRunningCheck: ~
     Basilicom\KoalityBundle\Checks\NewCartsPerTimeIntervalCheck: ~
 

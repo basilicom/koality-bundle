@@ -30,7 +30,7 @@ class OrdersPerTimeIntervalCheck implements Check
         if ($ordersCount >= $this->threshold) {
             $result = new MetricAwareResult(
                 Result::STATUS_PASS,
-                'Count of orders during the specified time interval. Threshold: ' . $this->threshold
+                'Count of orders during the specified time interval is above threshold of: ' . $this->threshold
             );
             $result->setMetric($ordersCount, 'Orders', MetricAwareResult::METRIC_TYPE_NUMERIC);
             $result->setObservedValuePrecision(2);
@@ -38,7 +38,7 @@ class OrdersPerTimeIntervalCheck implements Check
         if ($ordersCount < $this->threshold) {
             $result = new MetricAwareResult(
                 Result::STATUS_FAIL,
-                'Count of orders during the specified time interval. Threshold: ' . $this->threshold
+                'Count of orders during the specified time interval is below threshold of: ' . $this->threshold
             );
             $result->setMetric($ordersCount, 'Orders', MetricAwareResult::METRIC_TYPE_NUMERIC);
             $result->setObservedValuePrecision(2);
@@ -47,8 +47,6 @@ class OrdersPerTimeIntervalCheck implements Check
         return $result;
     }
 
-
-    //TODO Check ob eCommerceFra
     public function getOrdersCount(): int
     {
         $orderManager = Factory::getInstance()->getOrderManager();

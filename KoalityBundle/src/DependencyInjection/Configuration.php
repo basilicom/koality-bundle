@@ -23,6 +23,7 @@ class Configuration implements ConfigurationInterface
     public const TIME_INTERVAL = 'time_interval';
     public const SPACE_USED_CHECK = 'space_used_check';
     public const LIMIT_IN_PERCENT = 'limit_in_percent';
+    public const PATH_TO_CONTAINER = 'path_to_container';
     public const CONTAINER_IS_RUNNING_CHECK = 'container_is_running_check';
     public const CONTAINER_NAME = 'container_name';
     public const DEBUG_MODE_ENABLED_CHECK = 'debug_mode_enabled_check';
@@ -69,6 +70,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->booleanNode(self::ENABLE)->end()
                         ->integerNode(self::LIMIT_IN_PERCENT)->end()
+                        ->scalarNode(self::PATH_TO_CONTAINER)->end()
                     ->end()
                 ->end() //SPACE_USED_CHECK
                 ->arrayNode(self::CONTAINER_IS_RUNNING_CHECK)

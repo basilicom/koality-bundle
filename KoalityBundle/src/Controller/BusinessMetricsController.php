@@ -21,7 +21,7 @@ class BusinessMetricsController extends FrontendController
     private KoalityFormat  $koalityFormatter;
     private ExecutorInterface $maintenanceExecutor;
 
-    private OrdersPerTimeIntervalCheck $ordersPerTimeIntervalCheck;
+   // private OrdersPerTimeIntervalCheck $ordersPerTimeIntervalCheck;
     private DebugModeEnabledCheck $debugModeEnabledCheck;
     private MaintenanceWorkerRunningCheck $maintenanceWorkerRunningCheck;
     private NewCartsPerTimeIntervalCheck $newCartsPerTimeIntervalCheck;
@@ -31,14 +31,15 @@ class BusinessMetricsController extends FrontendController
     //TODO Prüfen ob eCommerce Framework vorhanden, dann erst reinreichen
     public function __construct(
         $config,
-        OrdersPerTimeIntervalCheck $ordersPerTimeIntervalCheck,
+      //  OrdersPerTimeIntervalCheck $ordersPerTimeIntervalCheck,
         DebugModeEnabledCheck $debugModeEnabledCheck,
         MaintenanceWorkerRunningCheck $maintenanceWorkerRunningCheck,
         NewCartsPerTimeIntervalCheck $newCartsPerTimeIntervalCheck,
         Executor $maintenanceExecutor
+
     ) {
         $this->config = $config;
-        $this->ordersPerTimeIntervalCheck = $ordersPerTimeIntervalCheck;
+     //   $this->ordersPerTimeIntervalCheck = $ordersPerTimeIntervalCheck;
         $this->debugModeEnabledCheck = $debugModeEnabledCheck;
         $this->maintenanceWorkerRunningCheck = $maintenanceWorkerRunningCheck;
         $this->newCartsPerTimeIntervalCheck = $newCartsPerTimeIntervalCheck;
@@ -62,9 +63,16 @@ class BusinessMetricsController extends FrontendController
     private function runBusinessChecks()
     {
         //TODO Überlegen welche Response geliefert wird, wenn keine Metrik aktiviert wurde
-        if ($this->config[Configuration::ORDERS_PER_TIME_INTERVAL_CHECK][Configuration::ENABLE] === true) {
-            $this->runOrdersPerTimeIntervalCheck();
+
+        $availableBundles = $this->get("kernel")->getBundles();
+
+        if (array_key_exists("PimcoreEcommerceFrameworkBundle", $availableBundles))
+        {
+            if ($this->config[Configuration::ORDERS_PER_TIME_INTERVAL_CHECK][Configuration::ENABLE] === true) {
+                $this->runOrdersPerTimeIntervalCheck(new OrdersPerTimeIntervalCheck());
+            }
         }
+
         if ($this->config[Configuration::DEBUG_MODE_ENABLED_CHECK][Configuration::ENABLE] === true) {
             $this->runDebugModeEnabledCheck();
         }
@@ -80,14 +88,14 @@ class BusinessMetricsController extends FrontendController
         return json_encode($this->koalityFormatter->handle($runResult, false), JSON_PRETTY_PRINT);
     }
 
-    private function runOrdersPerTimeIntervalCheck()
+    private function runOrdersPerTimeIntervalCheck($check)
     {
         $hours = $this->config[Configuration::ORDERS_PER_TIME_INTERVAL_CHECK][Configuration::HOURS];
         $threshold = $this->config[Configuration::ORDERS_PER_TIME_INTERVAL_CHECK][Configuration::THRESHOLD];
-        $this->ordersPerTimeIntervalCheck->init($hours, $threshold);
+        $check->init($hours, $threshold);
 
         $this->healthFoundation->registerCheck(
-            $this->ordersPerTimeIntervalCheck,
+            $check,
             'orders_per_time_interval',
             'Shows count of orders during the last ' . $hours . ' hour(s)'
         );
@@ -95,8 +103,7 @@ class BusinessMetricsController extends FrontendController
 
     private function runNewCartsPerTimeIntervalCheck()
     {
-        $hours = $this->config[Configuration::NEW_CARTS_PER_TIME_INTERVAL_CHECK][Configuration::HOURS];
-
+        $hours = $this->config[Configuration::ORDERS_PER_TIME_INTERVAL_CHECK][Configuration::HOURS];
         $this->newCartsPerTimeIntervalCheck->init($hours);
 
         $this->healthFoundation->registerCheck(

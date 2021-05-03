@@ -62,13 +62,19 @@ class ServerMetricsController extends FrontendController
     private function runSpaceUsedCheck()
     {
         $limitInPercent = $this->config[Configuration::SPACE_USED_CHECK][Configuration::LIMIT_IN_PERCENT];
-        $this->spaceUsedCheck->init($limitInPercent);
+        $pathToContainer = $this->config[Configuration::SPACE_USED_CHECK][Configuration::PATH_TO_CONTAINER];
+        if (empty($pathToContainer)) {
+            $pathToContainer = '/';
+        }
+        $this->spaceUsedCheck->init($limitInPercent, $pathToContainer);
+
 
         $this->healthFoundation->registerCheck(
             $this->spaceUsedCheck,
             'space_used_check',
             'Space used on storage server. Limit is set to ' . $limitInPercent . ' percent'
         );
+
     }
 
     private function runContainerIsRunningCheck()
