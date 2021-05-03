@@ -1,9 +1,8 @@
 # Basilicom.de Pimcore - Koality Bundle
 
 ### General Information
-This Pimcore Bundle provides an endpoint for the health-check monitoring plugin from https://www.koality.io/de  
-There are 3 Checks already implemented, 2 from the *leankoala/healthfoundation* Bundle, namely **SpaceUsedCheck** and **UptimeCheck**.  
-The 3rd Check, **OrdersPerHourCheck** , is Pimcore eCommerce Framework specific and outputs the count of orders during the last hour.
+This Pimcore Bundle provides 2 different endpoints (one for business-metrics, one for server-metrics) for the health-check monitoring service of https://www.koality.io/de . 
+See Metrics Section for a detailed overview of the provided metrics.
 ### Usage
     composer require basilicom/koality-bundle
     
@@ -15,9 +14,41 @@ Make sure to register the Bundle in *AppKernel*, e.g.
 
 ### How the plugin works
 
-Once installed the Bundle will provide JSON formatted Data under the following endpoint 
+Once installed the Bundle will provide JSON formatted Data under the following endpoints
 
-    yourdomain.tu/koality-status
+    yourdomain.tu/pimcore-koality-bundle-business 
+    yourdomain.tu/pimcore-koality-bundle-server
+either for Business or Server metrics. 
+
+##### Configuration
+
+Add following config section to your config.yaml
+
+```
+koality:
+    orders_per_time_interval_check:
+        enable: true
+        hours: 24
+        threshold: 1000
+    new_carts_per_time_interval_check:
+        enable: true
+        hours: 1
+    debug_mode_enabled_check:
+        enable: true
+    maintenance_worker_running_check:
+        enable: true
+    server_uptime_check:
+        enable: true
+        time_interval: '7 years'
+    space_used_check:
+        enable: true
+        limit_in_percent: 80
+        path_to_container: '/some/path/'
+    container_is_running_check:
+        enable: true
+        container_name: 'test container name'
+    
+```
     
 ##### Example JSON Output
 
@@ -26,50 +57,59 @@ Once installed the Bundle will provide JSON formatted Data under the following e
     "status": "fail",
     "output": "The health check failed.",
     "checks": {
-        "space_used_check": {
-            "status": "pass",
-            "output": "Enough space left on device. 69% used (\/).",
-            "description": "Space used on storage server",
-            "observedValue": 0.69,
-            "observedUnit": "percent",
-            "metricType": "time_series_percent",
-            "observedValuePrecision": 2,
-            "limit": 0.95,
-            "limitType": "max"
-        },
-        "orders_per_hour_check": {
-            "status": "pass",
-            "output": "Count of orders during the last hour",
-            "description": "Shows count of orders during the last hour",
-            "observedValue": 23,
+        "orders_per_time_interval": {
+            "status": "fail",
+            "output": "Count of orders during the specified time interval is below threshold of: 1000",
+            "description": "Shows count of orders during the last 24 hour(s)",
+            "observedValue": 0,
             "observedUnit": "Orders",
             "metricType": "time_series_numeric",
             "observedValuePrecision": 2
         },
-        "server_uptime_check": {
+        "debug_mode_enabled_check": {
             "status": "fail",
-            "output": "Servers uptime is too high (2 years 11 days 8 hours 47 minutes)",
-            "description": "Shows the server uptime. Gives warning, if Limit is exceeded.",
+            "output": "Debug mode is ON",
+            "description": "Indicates whether debug mode is enabled.",
             "observedValue": 0,
             "metricType": "time_series_percent",
             "observedUnit": "percent"
-        }
+        },
+        "maintenance_worker_running_check": {
+            "status": "fail",
+            "output": "Maintenance Job wasn't executed within the last hour",
+            "description": "Indicates whether maintenance jobs where running within last hour",
+            "observedValue": 0,
+            "metricType": "time_series_percent",
+            "observedUnit": "percent"
+        },
+
+        ...
+
     }
 }
 ```
 
-### Metrics
+### Metrics 
 
 The following Metrics are implemented yet
 
-- **SpaceUsedCheck** - this check fails if the amount of space left on device is below 5% .
-- **UptimeCheck** - this check fails if the defined uptime is exceeded (1 year per Default).
-- **OrdersPerHourCheck** - this check measures the number of orders in the past hour.
+#### Server Metrics
 
+- **SpaceUsedCheck** - this check fails if the amount of space left on device is below de defined limit.
+- **UptimeCheck** - this check fails if the defined uptime is exceeded (1 year per Default).
+- **ContainerIsRunningCheck** - this check fails if the defined container isn't running.
+
+#### Business (Pimcore) Metrics
+
+- **OrdersPerTimeIntervalCheck** - this check measures the number of new orders during a certain time interval. It will fail, if the provided threshold isn't reached.
+- **NewCartsPerTimeIntervalCheck** - this check measures the number of new carts during a certain time interval.
+- **MaintenanceWorkerRunningCheck** - this check provides information on whether the maintenance job has been completed during the past hour.
+- **DebugModeEnabledCheck** - this check indicates whether debug mode is on.
 
 ### TODO
 
 Add more Pimcore eCommerce Specific Metrics like 
 - Minimum number of active products (to detect import failures)
-- Add possibility to configure the individual tests (via xml config file?)
+- Check for Pimcore Update
+- Login attempts during specified time period
 - tbc.

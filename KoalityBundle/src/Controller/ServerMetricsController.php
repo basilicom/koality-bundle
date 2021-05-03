@@ -92,6 +92,9 @@ class ServerMetricsController extends FrontendController
     private function runServerUptimeCheck()
     {
         $serverUptimeLimit = $this->config[Configuration::SERVER_UPTIME_CHECK][Configuration::TIME_INTERVAL];
+        if (empty($serverUptimeLimit)) {
+            $serverUptimeLimit = '1 year';
+        }
         $this->uptimeCheck->init($serverUptimeLimit);
 
         $this->healthFoundation->registerCheck(
