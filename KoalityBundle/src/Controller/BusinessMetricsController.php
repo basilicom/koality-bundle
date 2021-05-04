@@ -21,17 +21,14 @@ class BusinessMetricsController extends FrontendController
     private KoalityFormat  $koalityFormatter;
     private ExecutorInterface $maintenanceExecutor;
 
-   // private OrdersPerTimeIntervalCheck $ordersPerTimeIntervalCheck;
     private DebugModeEnabledCheck $debugModeEnabledCheck;
     private MaintenanceWorkerRunningCheck $maintenanceWorkerRunningCheck;
     private NewCartsPerTimeIntervalCheck $newCartsPerTimeIntervalCheck;
 
     private array $config;
 
-    //TODO Prüfen ob eCommerce Framework vorhanden, dann erst reinreichen
     public function __construct(
         $config,
-      //  OrdersPerTimeIntervalCheck $ordersPerTimeIntervalCheck,
         DebugModeEnabledCheck $debugModeEnabledCheck,
         MaintenanceWorkerRunningCheck $maintenanceWorkerRunningCheck,
         NewCartsPerTimeIntervalCheck $newCartsPerTimeIntervalCheck,
@@ -39,7 +36,6 @@ class BusinessMetricsController extends FrontendController
 
     ) {
         $this->config = $config;
-     //   $this->ordersPerTimeIntervalCheck = $ordersPerTimeIntervalCheck;
         $this->debugModeEnabledCheck = $debugModeEnabledCheck;
         $this->maintenanceWorkerRunningCheck = $maintenanceWorkerRunningCheck;
         $this->newCartsPerTimeIntervalCheck = $newCartsPerTimeIntervalCheck;
@@ -62,8 +58,6 @@ class BusinessMetricsController extends FrontendController
 
     private function runBusinessChecks()
     {
-        //TODO Überlegen welche Response geliefert wird, wenn keine Metrik aktiviert wurde
-
         $availableBundles = $this->get("kernel")->getBundles();
 
         if (array_key_exists("PimcoreEcommerceFrameworkBundle", $availableBundles))
