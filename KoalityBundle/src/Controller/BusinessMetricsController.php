@@ -13,13 +13,14 @@ use Pimcore\Controller\FrontendController;
 use Pimcore\Maintenance\Executor;
 use Pimcore\Maintenance\ExecutorInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\RouterInterface;
 
 class BusinessMetricsController extends FrontendController
 {
     private HealthFoundation $healthFoundation;
     private KoalityFormat  $koalityFormatter;
     private ExecutorInterface $maintenanceExecutor;
+    private RouterInterface $router;
 
     private DebugModeEnabledCheck $debugModeEnabledCheck;
     private MaintenanceWorkerRunningCheck $maintenanceWorkerRunningCheck;
@@ -32,7 +33,8 @@ class BusinessMetricsController extends FrontendController
         DebugModeEnabledCheck $debugModeEnabledCheck,
         MaintenanceWorkerRunningCheck $maintenanceWorkerRunningCheck,
         NewCartsPerTimeIntervalCheck $newCartsPerTimeIntervalCheck,
-        Executor $maintenanceExecutor
+        Executor $maintenanceExecutor,
+        RouterInterface $router
 
     ) {
         $this->config = $config;
@@ -40,14 +42,18 @@ class BusinessMetricsController extends FrontendController
         $this->maintenanceWorkerRunningCheck = $maintenanceWorkerRunningCheck;
         $this->newCartsPerTimeIntervalCheck = $newCartsPerTimeIntervalCheck;
         $this->maintenanceExecutor = $maintenanceExecutor;
+        $this->router = $router;
         $this->init();
     }
 
-    /**
-     * @Route("/pimcore-koality-bundle-business")
-     */
+
     public function businessChecksAction()
     {
+        $token = $this->config[Configuration::TOKEN][Configuration::SECRET];
+        if (!empty($token)) {
+            $this->router->generate('business_metrics', ['token' => $token]);
+        }
+
         $response = new Response();
         $response->setContent($this->runBusinessChecks());
         $response->headers->set('Content-Type', 'application/health+json');
@@ -131,5 +137,6 @@ class BusinessMetricsController extends FrontendController
     {
         $this->healthFoundation = new HealthFoundation();
         $this->koalityFormatter = new KoalityFormat();
+
     }
 }

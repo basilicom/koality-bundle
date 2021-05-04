@@ -1,5 +1,8 @@
-koality:
-    resource: "@KoalityBundle/Controller/"
-    type:     annotation
-    prefix:   /
-
+business_metrics:
+    path:       /pimcore-koality-bundle-business
+    controller: Basilicom\KoalityBundle\Controller\BusinessMetricsController::businessChecksAction
+    
+server_metrics:
+    path:       /pimcore-koality-bundle-server
+    controller: Basilicom\KoalityBundle\Controller\ServerMetricsController::serverChecksAction
+    

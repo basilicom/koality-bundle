@@ -10,12 +10,13 @@ use Leankoala\HealthFoundation\HealthFoundation as HealthFoundation;
 use Leankoala\HealthFoundation\Result\Format\Koality\KoalityFormat as KoalityFormat;
 use Pimcore\Controller\FrontendController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\RouterInterface;
 
 class ServerMetricsController extends FrontendController
 {
     private HealthFoundation $healthFoundation;
     private KoalityFormat  $koalityFormatter;
+    private RouterInterface $router;
 
     private SpaceUsedCheck $spaceUsedCheck;
     private ContainerIsRunningCheck $containerIsRunningCheck;
@@ -23,17 +24,20 @@ class ServerMetricsController extends FrontendController
 
     private array $config;
 
-    public function __construct($config)
+    public function __construct($config, RouterInterface $router)
     {
         $this->config = $config;
+        $this->router = $router;
         $this->init();
     }
 
-    /**
-     * @Route("/pimcore-koality-bundle-server")
-     */
     public function serverChecksAction()
     {
+        $token = $this->config[Configuration::TOKEN][Configuration::SECRET];
+        if (!empty($token)) {
+            $this->router->generate('server_metrics', ['token' => $token]);
+        }
+
         $response = new Response();
         $response->setContent($this->runServerChecks());
         $response->headers->set('Content-Type', 'application/health+json');

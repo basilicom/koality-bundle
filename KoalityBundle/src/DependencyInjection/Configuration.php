@@ -14,6 +14,9 @@ class Configuration implements ConfigurationInterface
 {
     public const KOALITY = 'koality';
     public const ENABLE = 'enable';
+    public const TOKEN = 'token';
+    public const SECRET = 'secret';
+
 
     public const ORDERS_PER_TIME_INTERVAL_CHECK = 'orders_per_time_interval_check';
     public const HOURS = 'hours';
@@ -36,49 +39,54 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder(self::KOALITY);
         $treeBuilder->getRootNode()
-            ->children()
-                ->arrayNode(self::ORDERS_PER_TIME_INTERVAL_CHECK)
-                    ->children()
-                        ->booleanNode(self::ENABLE)->end()
-                        ->integerNode(self::HOURS)->end()
-                        ->integerNode(self::THRESHOLD)->end()
-                    ->end()
-                ->end() //ORDERS_PER_TIME_INTERVAL_CHECK
-                ->arrayNode(self::NEW_CARTS_PER_TIME_INTERVAL_CHECK)
-                    ->children()
-                        ->booleanNode(self::ENABLE)->end()
-                        ->integerNode(self::HOURS)->end()
-                    ->end()
-                ->end() //NEW_CARTS_PER_TIME_INTERVAL_CHECK
-                ->arrayNode(self::DEBUG_MODE_ENABLED_CHECK)
-                    ->children()
-                        ->booleanNode(self::ENABLE)->end()
-                    ->end()
-                ->end() //DEBUG_MODE_ENABLED_CHECK
-                ->arrayNode(self::MAINTENANCE_WORKER_RUNNING_CHECK)
-                    ->children()
-                        ->booleanNode(self::ENABLE)->end()
-                    ->end()
-                ->end() //MAINTENANCE_WORKER_RUNNING_CHECK
-                ->arrayNode(self::SERVER_UPTIME_CHECK)
-                    ->children()
-                        ->booleanNode(self::ENABLE)->end()
-                        ->scalarNode(self::TIME_INTERVAL)->end()
-                    ->end()
-                ->end() //SERVER_UPTIME_CHECK
-                ->arrayNode(self::SPACE_USED_CHECK)
-                    ->children()
-                        ->booleanNode(self::ENABLE)->end()
-                        ->integerNode(self::LIMIT_IN_PERCENT)->end()
-                        ->scalarNode(self::PATH_TO_CONTAINER)->end()
-                    ->end()
-                ->end() //SPACE_USED_CHECK
-                ->arrayNode(self::CONTAINER_IS_RUNNING_CHECK)
-                    ->children()
-                        ->booleanNode(self::ENABLE)->end()
-                        ->scalarNode(self::CONTAINER_NAME)->end()
-                    ->end()
-                ->end() //CONTAINER_IS_RUNNING_CHECK
+                ->children()
+                    ->arrayNode(self::TOKEN)
+                        ->children()
+                            ->scalarNode(self::SECRET)->end()
+                        ->end()
+                    ->end() //TOKEN
+                    ->arrayNode(self::ORDERS_PER_TIME_INTERVAL_CHECK)
+                        ->children()
+                            ->booleanNode(self::ENABLE)->end()
+                            ->integerNode(self::HOURS)->end()
+                            ->integerNode(self::THRESHOLD)->end()
+                        ->end()
+                    ->end() //ORDERS_PER_TIME_INTERVAL_CHECK
+                    ->arrayNode(self::NEW_CARTS_PER_TIME_INTERVAL_CHECK)
+                        ->children()
+                            ->booleanNode(self::ENABLE)->end()
+                            ->integerNode(self::HOURS)->end()
+                        ->end()
+                    ->end() //NEW_CARTS_PER_TIME_INTERVAL_CHECK
+                    ->arrayNode(self::DEBUG_MODE_ENABLED_CHECK)
+                        ->children()
+                            ->booleanNode(self::ENABLE)->end()
+                        ->end()
+                    ->end() //DEBUG_MODE_ENABLED_CHECK
+                    ->arrayNode(self::MAINTENANCE_WORKER_RUNNING_CHECK)
+                        ->children()
+                            ->booleanNode(self::ENABLE)->end()
+                        ->end()
+                    ->end() //MAINTENANCE_WORKER_RUNNING_CHECK
+                    ->arrayNode(self::SERVER_UPTIME_CHECK)
+                        ->children()
+                            ->booleanNode(self::ENABLE)->end()
+                            ->scalarNode(self::TIME_INTERVAL)->end()
+                        ->end()
+                    ->end() //SERVER_UPTIME_CHECK
+                    ->arrayNode(self::SPACE_USED_CHECK)
+                        ->children()
+                            ->booleanNode(self::ENABLE)->end()
+                            ->integerNode(self::LIMIT_IN_PERCENT)->end()
+                            ->scalarNode(self::PATH_TO_CONTAINER)->end()
+                        ->end()
+                    ->end() //SPACE_USED_CHECK
+                    ->arrayNode(self::CONTAINER_IS_RUNNING_CHECK)
+                        ->children()
+                            ->booleanNode(self::ENABLE)->end()
+                            ->scalarNode(self::CONTAINER_NAME)->end()
+                        ->end()
+                    ->end() //CONTAINER_IS_RUNNING_CHECK
             ->end()
         ;
 

@@ -18,7 +18,12 @@ Once installed the Bundle will provide JSON formatted Data under the following e
 
     yourdomain.tu/pimcore-koality-bundle-business 
     yourdomain.tu/pimcore-koality-bundle-server
-either for Business or Server metrics. 
+either for Business or Server metrics.
+
+If you've set a secret token the endpoints will look as follows
+
+    yourdomain.tu/pimcore-koality-bundle-business?token=mySecret
+    yourdomain.tu/pimcore-koality-bundle-server?token=mySecret
 
 ##### Configuration
 
@@ -26,6 +31,8 @@ Add following config section to your config.yaml
 
 ```
 koality:
+    token:
+        secret: 'mySecret'
     orders_per_time_interval_check:
         enable: true
         hours: 24
